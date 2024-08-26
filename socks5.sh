@@ -34,15 +34,22 @@ EOF
 config_xray() {
     config_type=$1
     mkdir -p /etc/xrayL
-
-    START_PORT=$DEFAULT_START_PORT
-
-    if [ "$config_type" == "vmess" ]; then
-        UUID=$DEFAULT_UUID
-        WS_PATH=$DEFAULT_WS_PATH
+    if [ "$config_type" != "socks" ] && [ "$config_type" != "vmess" ]; then
+        echo "类型错误！仅支持socks和vmess."
+        exit 1
     fi
 
-    read -p "54.255.124.53" ALLOWED_IP
+    read -p "起始端口 (默认 $DEFAULT_START_PORT): " START_PORT
+    START_PORT=${START_PORT:-$DEFAULT_START_PORT}
+
+    if [ "$config_type" == "vmess" ]; then
+        read -p "UUID (默认随机): " UUID
+        UUID=${UUID:-$DEFAULT_UUID}
+        read -p "WebSocket 路径 (默认 $DEFAULT_WS_PATH): " WS_PATH
+        WS_PATH=${WS_PATH:-$DEFAULT_WS_PATH}
+    fi
+
+    read -p "请输入白名单IP地址: " ALLOWED_IP
 
     for ((i = 0; i < ${#IP_ADDRESSES[@]}; i++)); do
         config_content+="[[inbounds]]\n"
@@ -50,7 +57,7 @@ config_xray() {
         config_content+="protocol = \"$config_type\"\n"
         config_content+="tag = \"tag_$((i + 1))\"\n"
         config_content+="[inbounds.settings]\n"
-        config_content+="ip = \"$ALLOWED_IP\"\n"  # 添加白名单IP限制
+        config_content+="ip = \"54.255.124.53\"\n"  # 添加白名单IP限制
         if [ "$config_type" == "socks" ]; then
             config_content+="udp = true\n"
         elif [ "$config_type" == "vmess" ]; then
@@ -83,6 +90,7 @@ config_xray() {
     fi
     echo ""
 }
+
 
 
 main() {
