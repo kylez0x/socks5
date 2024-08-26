@@ -39,8 +39,9 @@ config_xray() {
         exit 1
     fi
 
-    read -p "起始端口 (默认 $DEFAULT_START_PORT): " START_PORT
-    START_PORT=${START_PORT:-$DEFAULT_START_PORT}
+    # 移除手动输入端口部分
+    # read -p "起始端口 (默认 $DEFAULT_START_PORT): " START_PORT
+    # START_PORT=${START_PORT:-$DEFAULT_START_PORT}
 
     if [ "$config_type" == "vmess" ]; then
         read -p "UUID (默认随机): " UUID
@@ -49,7 +50,12 @@ config_xray() {
         WS_PATH=${WS_PATH:-$DEFAULT_WS_PATH}
     fi
 
-    read -p "请输入白名单IP地址: " ALLOWED_IP
+    # 获取允许的IP地址
+    read -p "请输入允许访问的IP地址 (多个IP用空格隔开): " ALLOWED_IPS
+    ALLOWED_IP_ARRAY=($ALLOWED_IPS)
+
+    # 使用默认起始端口
+    START_PORT=$DEFAULT_START_PORT
 
     for ((i = 0; i < ${#IP_ADDRESSES[@]}; i++)); do
         config_content+="[[inbounds]]\n"
@@ -57,7 +63,10 @@ config_xray() {
         config_content+="protocol = \"$config_type\"\n"
         config_content+="tag = \"tag_$((i + 1))\"\n"
         config_content+="[inbounds.settings]\n"
-        config_content+="ip = \"$ALLOWED_IP\"\n"  # 添加白名单IP限制
+        # 使用数组遍历添加白名单IP
+        for j in "${ALLOWED_IP_ARRAY[@]}"; do
+            config_content+="ip = \"$j\"\n"
+        done
         if [ "$config_type" == "socks" ]; then
             config_content+="udp = true\n"
         elif [ "$config_type" == "vmess" ]; then
