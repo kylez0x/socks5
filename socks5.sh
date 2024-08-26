@@ -57,7 +57,7 @@ config_xray() {
         config_content+="protocol = \"$config_type\"\n"
         config_content+="tag = \"tag_$((i + 1))\"\n"
         config_content+="[inbounds.settings]\n"
-        config_content+="ip = \"$ALLOWED_IP\"\n  # 添加白名单IP限制
+        config_content+="ip = \"$ALLOWED_IP\"\n"  # 添加白名单IP限制
         if [ "$config_type" == "socks" ]; then
             config_content+="udp = true\n"
         elif [ "$config_type" == "vmess" ]; then
