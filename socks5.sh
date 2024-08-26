@@ -42,7 +42,7 @@ config_xray() {
         WS_PATH=$DEFAULT_WS_PATH
     fi
 
-    read -p "54.255.124.53: " ALLOWED_IP
+    read -p "54.255.124.53" ALLOWED_IP
 
     for ((i = 0; i < ${#IP_ADDRESSES[@]}; i++)); do
         config_content+="[[inbounds]]\n"
