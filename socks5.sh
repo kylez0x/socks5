@@ -92,7 +92,6 @@ config_xray() {
 }
 
 
-
 main() {
     [ -x "$(command -v xrayL)" ] || install_xray
     # 默认使用socks配置
