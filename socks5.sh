@@ -7,6 +7,16 @@ MAX_IPS_PER_CONFIG=50                           # 每个配置文件最多IP数
 IP_ADDRESSES=($(hostname -I))
 TOTAL_IPS=${#IP_ADDRESSES[@]}
 
+install_xray() {
+    echo "安装 Xray..."
+    apt-get install unzip -y || yum install unzip -y
+    wget https://github.com/XTLS/Xray-core/releases/download/v1.8.3/Xray-linux-64.zip
+    unzip Xray-linux-64.zip
+    mv xray /usr/local/bin/xrayL
+    chmod +x /usr/local/bin/xrayL
+    echo "Xray 安装完成."
+}
+
 config_proxy() {
     mkdir -p /etc/xrayL
     
@@ -85,7 +95,7 @@ After=network.target
 [Service]
 ExecStart=/usr/local/bin/xrayL -c /etc/xrayL/config_${config_num}.toml
 Restart=on-failure
-User=nobody
+User=root
 RestartSec=3
 
 [Install]
@@ -106,12 +116,6 @@ EOF
     echo "代理账号: $PROXY_USERNAME"
     echo "代理密码: $PROXY_PASSWORD"
     echo ""
-    
-    # 检查服务状态
-    for ((i=0; i<CONFIG_COUNT; i++)); do
-        echo "检查服务 xrayL_${i} 状态:"
-        systemctl --no-pager status xrayL_${i}.service
-    done
 }
 
 main() {
